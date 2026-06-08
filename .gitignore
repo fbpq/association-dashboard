@@ -1,0 +1,35 @@
+# ── Python / Backend ───────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+*.egg-info/
+
+# ── Node / Frontend ─────────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+*.tsbuildinfo
+
+# ── Uploads / user data ─────────────────────────────────────
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# ── OS / Editor ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# ── Logs ────────────────────────────────────────────────────
+*.log
+logs/

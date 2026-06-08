@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #2174b8;
+  --primary-dark: #154974;
+  --primary-light: #f0f7fd;
+  --accent: #7fa343;
+  --accent-light: #f3f8ec;
+  --danger: #DC2626;
+  --warning: #D97706;
+  --text-primary: #333333;
+  --text-secondary: #555555;
+  --border: #E2E8F0;
+  --surface: #FFFFFF;
+  --background: #F1F5F9;
+}
+
+* {
+  font-family: 'Vazirmatn', Tahoma, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+  lang: fa;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* RTL utilities */
+.rtl { direction: rtl; }
+.ltr { direction: ltr; }
+
+/* Persian number input */
+input[type="number"] {
+  direction: ltr;
+  text-align: right;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom animations */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Chart RTL fixes */
+.recharts-wrapper {
+  direction: ltr;
+}
+.recharts-legend-wrapper {
+  direction: rtl;
+}
+
+/* Table hover */
+.data-table tr:hover {
+  background-color: #F8FAFC;
+}
+
+/* Toast animation */
+@keyframes toastIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes toastOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+.toast-in { animation: toastIn 0.3s ease-out; }
+.toast-out { animation: toastOut 0.3s ease-in forwards; }
+
+/* Focus ring RTL */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1;
+}
+
+/* Sidebar transition */
+.sidebar-transition {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card hover lift */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(33,116,184,0.25);
+}
+
+/* Badge pulse */
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.badge-pulse {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* Drag active */
+.drag-active {
+  border-color: var(--primary) !important;
+  background: var(--primary-light) !important;
+}
+
+/* Progress bar */
+@keyframes progressSlide {
+  from { width: 0; }
+}
+.progress-animate {
+  animation: progressSlide 0.6s ease-out;
+}
+
+/* Print styles */
+@media print {
+  .no-print { display: none !important; }
+  .print-full { width: 100% !important; }
+}
