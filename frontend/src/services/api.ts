@@ -31,7 +31,7 @@ let mockUsers: ManagedUser[] = [...MOCK_USERS];
 let nextUserId = Math.max(...MOCK_USERS.map(u => u.id)) + 1;
 
 const BASE_URL = '/api';
-const MOCK_MODE = true; // false = production (backend running), true = local dev
+const MOCK_MODE = false; // false = production (backend running), true = local dev
 
 // ── HTTP helpers ─────────────────────────────────────────────────────────────
 
