@@ -64,6 +64,7 @@ async def seed_admin():
     from app.db.session import SessionLocal
     from app.models.user import User
     from app.core.security import hash_password
+    from sqlalchemy.exc import IntegrityError
 
     db = SessionLocal()
     try:
@@ -80,6 +81,12 @@ async def seed_admin():
             db.add(admin)
             db.commit()
             print(f"✓ Admin user '{settings.ADMIN_USERNAME}' created.")
+    except IntegrityError:
+        db.rollback()
+        print(f"ℹ Admin user '{settings.ADMIN_USERNAME}' already exists.")
+    except Exception as e:
+        db.rollback()
+        print(f"⚠ Could not seed admin: {e}")
     finally:
         db.close()
 
