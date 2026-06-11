@@ -28,8 +28,8 @@ class FileOut(BaseModel):
     file_size: int
     uploaded_by: str
     status: str
-    parsed_at: Optional[str]
-    created_at: str
+    parsed_at: Optional[datetime]
+    created_at: datetime
     error_message: Optional[str]
     record_count: Optional[int]
     warnings_count: Optional[int]
@@ -45,7 +45,7 @@ class LogOut(BaseModel):
     message: str
     row_number: Optional[int]
     column_name: Optional[str]
-    created_at: str
+    created_at: datetime
 
     class Config:
         from_attributes = True
