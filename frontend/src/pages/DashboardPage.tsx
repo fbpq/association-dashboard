@@ -15,7 +15,6 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SkeletonCard } from '@/components/ui/LoadingSpinner';
-import { MOCK_ASSOCIATIONS, MOCK_FORMS } from '@/services/mockData';
 
 interface OutletCtx { onMobileMenuOpen: () => void }
 
@@ -24,6 +23,7 @@ type ModalState = {
   subtitle?: string;
   associations?: Association[];
   forms?: AssociationForm[];
+  loading?: boolean;
 } | null;
 
 export const DashboardPage: React.FC = () => {
@@ -36,7 +36,25 @@ export const DashboardPage: React.FC = () => {
   const [error, setError] = useState(false);
   const [modal, setModal] = useState<ModalState>(null);
 
-  const openModal = (state: NonNullable<ModalState>) => setModal(state);
+  const openAssocModal = async (title: string, subtitle: string, filters: Record<string, unknown> = {}) => {
+    setModal({ title, subtitle, loading: true });
+    try {
+      const res = await dashboardApi.getAssociations({ per_page: 100, ...filters } as Parameters<typeof dashboardApi.getAssociations>[0]);
+      setModal({ title, subtitle, associations: res.items });
+    } catch {
+      setModal({ title, subtitle, associations: [] });
+    }
+  };
+
+  const openFormsModal = async (title: string, subtitle: string, filters: Record<string, unknown> = {}) => {
+    setModal({ title, subtitle, loading: true });
+    try {
+      const res = await dashboardApi.getForms({ per_page: 100, ...filters } as Parameters<typeof dashboardApi.getForms>[0]);
+      setModal({ title, subtitle, forms: res.items });
+    } catch {
+      setModal({ title, subtitle, forms: [] });
+    }
+  };
 
   useEffect(() => {
     Promise.all([dashboardApi.getSummary(), dashboardApi.getCharts()])
@@ -109,13 +127,13 @@ export const DashboardPage: React.FC = () => {
                 {loading ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />) : (
                   <>
                     <KPICard title="کل انجمن‌ها" value={kpi!.total_associations} icon={Building2} variant="primary" subtitle="انجمن ثبت‌شده"
-                      onClick={() => openModal({ title: 'کل انجمن‌ها', subtitle: 'همه انجمن‌های ثبت‌شده', associations: MOCK_ASSOCIATIONS })} />
+                      onClick={() => openAssocModal('کل انجمن‌ها', 'همه انجمن‌های ثبت‌شده')} />
                     <KPICard title="انجمن‌های فعال" value={kpi!.active_associations} icon={CheckCircle} variant="success" subtitle={`از ${kpi!.total_associations} انجمن`}
-                      onClick={() => openModal({ title: 'انجمن‌های فعال', subtitle: 'انجمن‌هایی با وضعیت فعال', associations: MOCK_ASSOCIATIONS.filter(a => a.activity_status === 'فعال') })} />
+                      onClick={() => openAssocModal('انجمن‌های فعال', 'انجمن‌هایی با وضعیت فعال', { activity_status: 'فعال' })} />
                     <KPICard title="نیازمند پیگیری" value={kpi!.needs_follow_up_associations} icon={AlertCircle} variant="warning" subtitle="انجمن دارای نقص"
-                      onClick={() => openModal({ title: 'نیازمند پیگیری', subtitle: 'انجمن‌هایی که نیاز به اقدام دارند', associations: MOCK_ASSOCIATIONS.filter(a => a.needs_follow_up) })} />
+                      onClick={() => openAssocModal('نیازمند پیگیری', 'انجمن‌هایی که نیاز به اقدام دارند', { needs_follow_up: true })} />
                     <KPICard title="فاقد لوگو/هدر" value={kpi!.no_logo + kpi!.no_header} icon={Image} variant="danger" subtitle="نیاز به تکمیل"
-                      onClick={() => openModal({ title: 'فاقد لوگو یا هدر', subtitle: 'انجمن‌هایی که لوگو یا هدر ندارند', associations: MOCK_ASSOCIATIONS.filter(a => a.logo_status !== 'دارد' || a.header_status !== 'دارد') })} />
+                      onClick={() => openAssocModal('فاقد لوگو یا هدر', 'انجمن‌هایی که لوگو یا هدر ندارند', { logo_status: 'ندارد' })} />
                   </>
                 )}
               </div>
@@ -128,13 +146,13 @@ export const DashboardPage: React.FC = () => {
                 {loading ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />) : (
                   <>
                     <KPICard title="کل فرم‌ها" value={kpi!.total_forms} icon={FileText} variant="primary" subtitle="فرم ثبت‌شده"
-                      onClick={() => openModal({ title: 'کل فرم‌ها', subtitle: 'همه فرم‌های ثبت‌شده', forms: MOCK_FORMS })} />
+                      onClick={() => openFormsModal('کل فرم‌ها', 'همه فرم‌های ثبت‌شده')} />
                     <KPICard title="فرم‌های کامل" value={kpi!.complete_forms} icon={CheckCircle} variant="success" subtitle="امضای کامل"
-                      onClick={() => openModal({ title: 'فرم‌های کامل', subtitle: 'فرم‌هایی با امضای کامل', forms: MOCK_FORMS.filter(f => f.is_complete && !f.is_cancelled) })} />
+                      onClick={() => openFormsModal('فرم‌های کامل', 'فرم‌هایی با امضای کامل', { is_complete: true })} />
                     <KPICard title="فرم‌های ناقص" value={kpi!.incomplete_forms} icon={FileX} variant="danger" subtitle="نقص امضا یا اطلاعات"
-                      onClick={() => openModal({ title: 'فرم‌های ناقص', subtitle: 'فرم‌هایی با نقص امضا یا اطلاعات', forms: MOCK_FORMS.filter(f => !f.is_complete && !f.is_cancelled) })} />
+                      onClick={() => openFormsModal('فرم‌های ناقص', 'فرم‌هایی با نقص امضا یا اطلاعات', { is_complete: false })} />
                     <KPICard title="فاقد ایمیل دانشجویی" value={kpi!.no_email} icon={Mail} variant="warning" subtitle="انجمن بدون ایمیل"
-                      onClick={() => openModal({ title: 'فاقد ایمیل دانشجویی', subtitle: 'انجمن‌هایی که ایمیل دانشجویی ندارند', associations: MOCK_ASSOCIATIONS.filter(a => !a.student_email) })} />
+                      onClick={() => openAssocModal('فاقد ایمیل دانشجویی', 'انجمن‌هایی که ایمیل دانشجویی ندارند', { has_email: false })} />
                   </>
                 )}
               </div>
