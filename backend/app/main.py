@@ -17,7 +17,7 @@ Base.metadata.create_all(bind=engine)
 
 
 def _migrate():
-    """Safely add new columns to existing tables without dropping data."""
+    """Safely add new columns and update existing column types without dropping data."""
     new_columns = [
         ("users", "position",   "VARCHAR(200)"),
         ("users", "avatar",     "TEXT"),
@@ -26,10 +26,38 @@ def _migrate():
         ("users", "department", "VARCHAR(100)"),
         ("users", "bio",        "TEXT"),
     ]
+    # Columns that need to be widened to TEXT to accept arbitrary-length user data
+    widen_to_text = [
+        ("associations", "name"),
+        ("associations", "secretary_name"),
+        ("associations", "phone"),
+        ("associations", "activity_status"),
+        ("associations", "logo_status"),
+        ("associations", "header_status"),
+        ("associations", "student_email"),
+        ("associations", "roadmap_session"),
+        ("associations", "channel_bale"),
+        ("associations", "channel_rubika"),
+        ("associations", "channel_igap"),
+        ("associations", "channel_ita"),
+        ("associations", "content_production"),
+        ("associations", "form_competition"),
+        ("associations", "form_workshop"),
+        ("associations", "status"),
+        ("associations", "site_activity_registered"),
+        ("associations", "roadmap"),
+        ("associations", "new_license_session"),
+    ]
     with engine.connect() as conn:
         for table, col, col_type in new_columns:
             try:
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col} {col_type}"))
+                conn.commit()
+            except Exception:
+                conn.rollback()
+        for table, col in widen_to_text:
+            try:
+                conn.execute(text(f"ALTER TABLE {table} ALTER COLUMN {col} TYPE TEXT"))
                 conn.commit()
             except Exception:
                 conn.rollback()
