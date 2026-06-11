@@ -107,8 +107,18 @@ async def upload_file(
     db.commit()
     db.refresh(upload_record)
 
-    # Process in background
-    background_tasks.add_task(process_upload, db, upload_record)
+    # Process in background with a fresh DB session (request session closes after response)
+    upload_id = upload_record.id
+    def _bg():
+        from app.db.session import SessionLocal as _SL
+        _db = _SL()
+        try:
+            rec = _db.query(UploadedFile).filter(UploadedFile.id == upload_id).first()
+            if rec:
+                process_upload(_db, rec)
+        finally:
+            _db.close()
+    background_tasks.add_task(_bg)
     return upload_record
 
 

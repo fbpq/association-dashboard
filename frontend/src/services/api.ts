@@ -141,7 +141,16 @@ export const filesApi = {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress?.(Math.round((e.loaded / e.total) * 100)); };
-      xhr.onload = () => { if (xhr.status < 300) resolve(JSON.parse(xhr.responseText)); else reject(new Error(JSON.parse(xhr.responseText)?.detail || 'خطای آپلود')); };
+      xhr.onload = () => {
+        if (xhr.status < 300) {
+          try { resolve(JSON.parse(xhr.responseText)); }
+          catch { reject(new Error('پاسخ سرور نامعتبر است')); }
+        } else {
+          let msg = `خطای آپلود (${xhr.status})`;
+          try { msg = JSON.parse(xhr.responseText)?.detail || msg; } catch {}
+          reject(new Error(msg));
+        }
+      };
       xhr.onerror = () => reject(new Error('خطای شبکه'));
       xhr.open('POST', `${BASE_URL}/files/upload`);
       if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
